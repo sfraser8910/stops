@@ -9,9 +9,18 @@ execute:
 
 ```{r}
 #|message: false
-library(tidyverse)
+#|warning: false
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(tidymodels)
+})
 library(primer.data)
+library(broom)
 ```
 
+$$
+\log\left( \frac{\mathbb{P}(Y = 1)}{\mathbb{P}(Y = 0)} \right) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k
+$$
 
-Arrests in traffic stops are related to a variety of factors. To understand the impact of race om traffic stop arrests I examine data from the Stanford Open Policing Project.
+
+Arrests in traffic stops are related to a variety of factors. To understand the impact of race om traffic stop arrests I examine data from the Stanford Open Policing Project. However, one potential weakness in this model is the lack of stability in the data due to changes overtime in the law.
