@@ -18,9 +18,74 @@ library(primer.data)
 library(broom)
 ```
 
+```{r}
+x <- stops |>
+  filter(race %in% c("black", "white")) |>
+  mutate(race = str_to_title(race), 
+         sex = str_to_title(sex))
+```
+
+```{r}
+#| cache: true
+fit_stops <- linear_reg() |>
+    set_engine("lm") |>
+    fit(arrested ~ sex + race*zone, data = x)
+```
+
+```{r}
+# Load required libraries
+library(broom)
+library(gt)
+
+# Get the model summary
+table_data <- tidy(fit_stops, conf.int = TRUE)
+
+# Clean and rename columns
+table_data |>
+  dplyr::mutate(term = gsub("sexMale", "Sex: Male", term),
+                term = gsub("raceWhite", "Race: White", term),
+                term = gsub("zone", "Zone ", term),
+                term = gsub("\\(Intercept\\)", "Intercept", term)) |>
+  dplyr::select(term, estimate, std.error, conf.low, conf.high, p.value) |>
+  gt() |>
+  fmt_number(columns = c(estimate, std.error, conf.low, conf.high, p.value), decimals = 4) |>
+  cols_label(
+    term = "Term",
+    estimate = "Estimate",
+    std.error = "Std. Error",
+    conf.low = "95% CI (Low)",
+    conf.high = "95% CI (High)",
+    p.value = "p-value"
+  ) |>
+  tab_header(
+    title = "Logistic Regression Coefficients",
+    subtitle = "Model: Probability of Stop"
+  ) |>
+  tab_options(
+    table.font.size = "small",
+    data_row.padding = px(4),
+    table.align = "center"
+  )
+
+```
+
 $$
 \log\left( \frac{\mathbb{P}(Y = 1)}{\mathbb{P}(Y = 0)} \right) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + \cdots + \beta_k X_k
 $$
 
+$$
+\log\left( \frac{\mathbb{P}(\text{stop} = 1)}{\mathbb{P}(\text{stop} = 0)} \right)
+= 0.177 
++ 0.0614 \cdot \text{sex}_{\text{Male}}
+- 0.0445 \cdot \text{race}_{\text{White}}
++ 0.0146 \cdot \text{zone}_{\text{B}}
++ 0.00610 \cdot \text{zone}_{\text{C}}
++ 0.0781 \cdot \text{zone}_{\text{D}}
++ 0.00190 \cdot \text{zone}_{\text{E}}
+- 0.00271 \cdot \text{zone}_{\text{F}}
++ 0.0309 \cdot \text{zone}_{\text{G}}
++ 0.0757 \cdot \text{zone}_{\text{H}}
++ \cdots
+$$
 
-Arrests in traffic stops are related to a variety of factors. To understand the impact of race om traffic stop arrests I examine data from the Stanford Open Policing Project. However, one potential weakness in this model is the lack of stability in the data due to changes overtime in the law.
+Arrests in traffic stops are related to a variety of factors. To understand the impact of race om traffic stop arrests I examine data from the Stanford Open Policing Project. However, one potential weakness in this model is the lack of stability in the data due to changes overtime in the law. I model traffic stop arrests with a logistic model as a function of race, sex, and zone.
