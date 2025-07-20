@@ -1,0 +1,17 @@
+---
+title: "Stops"
+format: html
+author: Surya Fraser
+execute: 
+  echo: false
+---
+
+
+```{r}
+#|message: false
+library(tidyverse)
+library(primer.data)
+```
+
+
+Arrests in traffic stops are related to a variety of factors. To understand the impact of race om traffic stop arrests I examine data from the Stanford Open Policing Project.
